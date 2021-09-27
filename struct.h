@@ -38,8 +38,8 @@ typedef struct block
 
     char free[972]; // Espcaço livre necessário para que cada bloco tenha 4kb
 
-    registry reg1;
-    registry reg2;
+    registry reg1; // offset 984
+    registry reg2; // offset 2492
 } block;
 
 typedef struct intBlock

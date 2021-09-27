@@ -57,11 +57,15 @@ int enterBucket(int id, registry reg){
                 ifd.write((char*)&newBlock, sizeof(block));
                 ifd.close();
 
-                // retorne o endereço onde o bloco foi gravado
+                // retorne o endereço onde o registro foi gravado
                 // é usado para gerar o índice 
                 if(bloquinho.address1 == 0 && newBlock.address1 == 1){
+                    // retorna o endereço do registro que acabamos de gravar dentro do bloco
+                    // o valor 984 é correspondente ao offset do campo *reg1* de (struct block)
                     return (sizeof(buck)*bucketN)+(sizeof(bloquinho)*(a))+984;
                 } else if(bloquinho.address2 == 0 && newBlock.address2 == 1){
+                    // retorna o endereço do registro que acabamos de gravar dentro do bloco
+                    // o valor 2492 é correspondente ao offset do campo *reg1* de (struct block)
                     return (sizeof(buck)*bucketN)+(sizeof(bloquinho)*(a))+2492;
                 }
                 break;

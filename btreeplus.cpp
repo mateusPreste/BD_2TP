@@ -11,9 +11,18 @@ class btreeplus{
 public:
     typedef struct registry
     {
+        // quantidade de nós válidos nesse bloco
+        // essa variável pode ser usada para 
         int  qntNo;
+        // indica se é nó folha, 0 - não é nó folha, 1 - é nó folha
         int  parent;
+        // vetor de chave, contem os valores de chave armazenados nesse bloco
+        // a quantidade de valores de chave válidos é indicado pela variável qntNo
         int  chave[499];
+        // ponteiros para outros blocos
+        // cada bloco está sequencialmente amazenado um após o outro
+        // e todos os blocos tem o mesmo tamanho
+        // o valor desse ponteiro é a sua ordem na lista(numero inteiro de inicio 0 (nó raiz) até x (ultimo nó folha))
         int  ponteiros[499];
     } registry;
 

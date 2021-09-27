@@ -10,11 +10,16 @@ DESCRIÇÃO DAS ESTRUTURAS
 todos os structs estão definidos em struct.h
 
 Arquivo hashing
-É organizado por buckets (struct bucket), cada bucket é formado por 18 blocos
-cada bloco é um bloco fisico de 4kb (struct block) e cada bloco possui 2 registros (struct registry)
+É organizado por buckets (struct.h struct bucket), cada bucket é formado por 18 blocos
+cada bloco é um bloco fisico de 4kb (struct.h struct block) e cada bloco possui 2 registros (struct.h struct registry)
 que efetivamente guardam os dados.
+basicamente para encontrar o bloco certo, basta encontrar o bucket correspondente usando a função hash (csvTest.cpp:23:5) definida no codigo e fazer uma busca sequencial dentro do bucket até encontrar o registro desejado.
 
 Indice Primário (Árvore B+)
 Possui grau 495
+É composto por blocos de 4kb, com a estrutura definida em btreepluss.cpp (struct registry)
+Todas as referencias aos outros blocos em (struct registry->ponteiros) são referencias virtuais, não são endereços físicos mas apenas um indice
+do bloco seguinte na lista
+A variável qntNo indica a quantidade de nós validos presente naquele bloco, use como condição final do seu laço de repetição para iterar os vetores chave e ponteiros.
 
 
