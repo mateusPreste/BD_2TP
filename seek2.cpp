@@ -24,16 +24,7 @@ typedef struct bregistry
     char snippet[1024];
 } bregistry;
 
-unsigned int read(unsigned int address){
-    if(address == -1){
-        std::cout << "REGISTRO NAO ENCONTRADO\n";
-        return -1;
-    }
-    std::fstream ifd("students.data", std::fstream::in |std::fstream::out | std::fstream::binary);
-    ifd.seekg(address, std::ios::beg);
-    bregistry regist;
-    ifd.read((char*)& regist, sizeof(bregistry));
-
+void printInfo(bregistry regist){
     std::cout << "ID: " << regist.id << '\n' <<
     "TITULO: " << regist.titulo << '\n' << 
     "ANO: " << regist.ano << '\n' << 
@@ -43,9 +34,18 @@ unsigned int read(unsigned int address){
     "SNIPPET: " << regist.snippet << std::endl;
 }
 
+bregistry read(unsigned int address){
+    std::fstream ifd("students.data", std::fstream::in |std::fstream::out | std::fstream::binary);
+    ifd.seekg(address, std::ios::beg);
+    bregistry regist;
+    ifd.read((char*)& regist, sizeof(bregistry));
+
+    return regist;
+}
+
 int blocos = 0;
 
-unsigned int recBTree(unsigned int id, int bl, int level){
+unsigned int recBTree(char title[300], unsigned int id, int bl, int level){
     //if(level > 10) return -1;
     //std::cout << "\n\nBL " << bl << std::endl;
  
@@ -62,22 +62,25 @@ unsigned int recBTree(unsigned int id, int bl, int level){
 
         if(reg.parent == 0){
             if(id < (unsigned int) reg.chave[b] ){
-                return recBTree(id, reg.ponteiros[b], level+1);
+                return recBTree(title, id, reg.ponteiros[b], level+1);
             } 
         } else{
             if(id == (unsigned int) reg.chave[b]){
-                blocos = level;
-                return reg.ponteiros[b];
+                bregistry thisRegistry = read(reg.chave[b]);
+                if(strcmp(title, thisRegistry.titulo) == 0){
+                    blocos = level;
+                    return reg.ponteiros[b];
+                } 
             }
         }
         
     }
 
     if(reg.parent == 0){
-        return recBTree(id, reg.ponteiros[b], level+1);
+        return recBTree(title, id, reg.ponteiros[b], level+1);
     } else{
         if(bl != (size/sizeof(reg))-1){
-            return recBTree(id, bl+1, level+1);
+            return recBTree(title, id, bl+1, level+1);
         }
         blocos = level;
         return -1;
@@ -100,12 +103,20 @@ int main(){
 
     unsigned int id = fnv_hash_1a_32(inp, 300);
 
-    unsigned int address = recBTree(id, 0, 1);
+    unsigned int address = recBTree(inp, id, 0, 1);
 
     //std::cout << "id " << id << std::endl;
     //std::cout << "address " << address << " " << (signed int) address << std::endl;
 
-    read(address);
+    if(address == -1){
+        std::cout << "REGISTRO NAO ENCONTRADO\n";
+        return ;
+    } else {
+        bregistry thisRegistry = read(address);
+        printInfo(thisRegistry);
+    }
+
+    
     std::cout  << "\nBlocos Lidos: " << blocos << " de " << size/sizeof(lregistry) << " blocos" << std::endl;
     //;
     //ifd.seekg(sizeof(registry), std::ios::beg);
