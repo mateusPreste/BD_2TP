@@ -13,7 +13,7 @@
 #include "btreeplus.cpp"
 
 // função responsável por inserir o registro no arquivo hash
-int enterBucket(int id, registry reg){
+unsigned int enterBucket(unsigned int id, registry reg){
     // abre o arquivo hash (students.data)
     std::fstream ifd("students.data", std::fstream::in |std::fstream::out | std::fstream::binary);
     // DEBUG std::ofstream output_file("students.data", std::ios::binary | std::ios_base::beg);
@@ -105,7 +105,7 @@ int enterBucket(int id, registry reg){
 }
 
 // Le a linha do csv e cria um registro *reg* onde os dados serão armazenados no arquivo hash e no indice primário
-int readLine(std::string texto, btreeplus *tree){
+int readLine(std::string texto, btreeplus *tree, int type){
     // Lê a linha atual do csv
     std::stringstream ss;
     ss << texto;
@@ -164,18 +164,28 @@ int readLine(std::string texto, btreeplus *tree){
         char snippet[1024];
         strncpy(snippet, v[6].c_str(), 1024);
 
+        unsigned int key;
+
+        if (type == 0){
+            key = stoi(v[0]);
+        } else{
+            key = fnv_hash_1a_32(titulo, 300);
+            //std::cout << key << " |" << titulo << "\n";
+        }
+
         // criamos o registro do dado atual usando a função writeRegistry, ela vai usar o padrao do (struct registry)
         // para armazenar o dado
-        registry reg = writeRegistry(stoi(v[0]), titulo, stoi(v[2]), autores, stoi(v[4]), atualizacao, snippet);
+        registry reg = writeRegistry(key, titulo, stoi(v[2]), autores, stoi(v[4]), atualizacao, snippet);
         
         // inserimos o registro atual no arquivo hash usando a função enterBucket
         // essa função vai retornar o endereço correspondente do registro no ARQUIVO HASH
-        int address = enterBucket(stoi(v[0]), reg);
+        unsigned int address = enterBucket(key, reg);
         
-        // DEBUG std::cout << address << std::endl;
+        // DEBUG 
+        //std::cout << address << std::endl;
 
         // criamos o par (id_registro, endereço_registro_arquivo_hash) e inserimos na estrutura do nosso indice primário
-        tree->inserir(stoi(v[0]), address);
+        tree->inserir(key, address);
 
 
         // DEBUG std::cout << "-|" << v[0] << std::endl;

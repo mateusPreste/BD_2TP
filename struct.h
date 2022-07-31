@@ -2,14 +2,34 @@
 #define STRUCT_H
 
 #include <cstring>
+#include <bitset>
 
 
 #define BUCKETSIZE 18
 #define BUCKETSAMOUNT 45000
 
+unsigned fnv_hash_1a_32 ( char key[300], int len ) {
+    char text[len];
+    unsigned h = 0x811c9dc5;
+
+    strncpy(text, key, len);
+
+    int i;
+
+    for ( i = 0; i < len; i++ ){
+      if(text[i] != '\0'){
+        h = ( h ^ text[i] ) * 0x01000193;
+        std::bitset<32> rp(h);
+        //std::cout << text[i] << " " << rp << " " << h << std::endl;
+      }
+    }
+
+    return h%20000000;
+}
+
 typedef struct registry
 {
-    int  id;
+    unsigned int id;
     char titulo[300];
     int  ano;
     char autores[150];
@@ -20,7 +40,7 @@ typedef struct registry
 
 typedef struct overRegistry
 {
-    int  id;
+    unsigned int  id;
     char titulo[300];
     int  ano;
     char autores[150];
@@ -80,7 +100,7 @@ typedef struct bucketArea
     bucket buckets[BUCKETSAMOUNT];
 } bucketArea;
 
-registry writeRegistry(int id, const char titulo[300], int ano, const char autores[150], int citacoes, const char atualizacao[16], const char snippet[1024]){
+registry writeRegistry(unsigned int id, const char titulo[300], int ano, const char autores[150], int citacoes, const char atualizacao[16], const char snippet[1024]){
     registry r = {};
         r.id = id;
         strncpy(r.titulo, titulo, 300);
@@ -92,7 +112,7 @@ registry writeRegistry(int id, const char titulo[300], int ano, const char autor
     return r;
 }
 
-overRegistry writeOverRegistry(int id, const char titulo[300], int ano, const char autores[150], 
+overRegistry writeOverRegistry(unsigned int id, const char titulo[300], int ano, const char autores[150], 
                                 int citacoes, const char atualizacao[16], const char snippet[1024], int rPointer){
     overRegistry r = {};
         r.id = id;
@@ -106,7 +126,7 @@ overRegistry writeOverRegistry(int id, const char titulo[300], int ano, const ch
     return r;
 }
 
-block writeBlock(int head, int address1, int address2, registry reg1, registry reg2){
+block writeBlock(unsigned int head, int address1, int address2, registry reg1, registry reg2){
     block bl = {};
         bl.head = head;
         bl.address1 = address1;
@@ -116,7 +136,7 @@ block writeBlock(int head, int address1, int address2, registry reg1, registry r
     return bl;
 }
 
-intBlock writeIntBlock(int head, int address1, int address2, registry reg1, registry reg2, int rPointer){
+intBlock writeIntBlock(unsigned int head, int address1, int address2, registry reg1, registry reg2, int rPointer){
     intBlock bl = {};
         bl.head = head;
         bl.address1 = address1;
@@ -127,7 +147,7 @@ intBlock writeIntBlock(int head, int address1, int address2, registry reg1, regi
     return bl;
 }
 
-offsetBlock writeOffsetBlock(int head, int address1, int address2, overRegistry reg1, overRegistry reg2, int rPointer){
+offsetBlock writeOffsetBlock(unsigned int head, int address1, int address2, overRegistry reg1, overRegistry reg2, int rPointer){
     offsetBlock bl = {};
         bl.head = head;
         bl.address1 = address1;

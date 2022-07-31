@@ -1,14 +1,21 @@
 #include <bits/stdc++.h>
 #include <algorithm>
 #include <iostream> 
+#include <string>
+
 using namespace std;
 
 #define MAX 499
 
 class btreeplus{
     int grau = 495;
+    string filename = "";
 
 public:
+    btreeplus(string name){
+        filename = name;
+    }
+
     typedef struct registry
     {
         // quantidade de nós válidos nesse bloco
@@ -23,7 +30,7 @@ public:
         // cada bloco está sequencialmente amazenado um após o outro
         // e todos os blocos tem o mesmo tamanho
         // o valor desse ponteiro é a sua ordem na lista(numero inteiro de inicio 0 (nó raiz) até x (ultimo nó folha))
-        int  ponteiros[499];
+        unsigned int  ponteiros[499];
     } registry;
 
     struct Bloco{
@@ -32,10 +39,10 @@ public:
         // ponteiro para bloco pai
         Bloco *blocoPai;
         // valores
-        int valores[MAX]{};
+        unsigned int valores[MAX]{};
         //child Blocks
         Bloco *blocosFilhos[MAX]{};
-        int ponteiros[MAX]{};
+        unsigned int ponteiros[MAX]{};
         Bloco() { // construtor do bloco
             qntNo = 0;
             blocoPai = nullptr;
@@ -66,8 +73,8 @@ public:
             bloco->valores[i] = INT_MAX;
             bloco->ponteiros[i] = 0;
         }
-        int val = blocoDireito->valores[0];
-        int ptn = blocoDireito->ponteiros[0];
+        unsigned int val = blocoDireito->valores[0];
+        unsigned int ptn = blocoDireito->ponteiros[0];
 
         if(bloco->blocoPai == nullptr){
             auto *blocoPai = new Bloco();
@@ -128,7 +135,7 @@ public:
             if(i!=x) bloco->blocosFilhos[i] = nullptr;
         }
 
-        int valor = blocoDireito->valores[0];
+        unsigned int valor = blocoDireito->valores[0];
         memcpy(&blocoDireito->valores, &blocoDireito->valores[1], sizeof(int) * (blocoDireito->qntNo + 1));
         memcpy(&blocoDireito->blocosFilhos, &blocoDireito->blocosFilhos[1], sizeof(blocoRaiz) * (blocoDireito->qntNo + 1));
 
@@ -179,19 +186,19 @@ public:
 
     }
 
-    void inserir(int valor, int pt){
+    void inserir(unsigned int valor, unsigned int pt){
         inserirNo(blocoRaiz, valor, pt);
     }
 
-    void inserirNo(Bloco *bloco, int valor, int pt){
+    void inserirNo(Bloco *bloco, unsigned int valor, unsigned int pt){
         for(int i=0; i <= bloco->qntNo; i++){
-            if(valor < bloco->valores[i] && bloco->blocosFilhos[i] != nullptr){
+            if(valor <= bloco->valores[i] && bloco->blocosFilhos[i] != nullptr){
                 inserirNo(bloco->blocosFilhos[i], valor, pt);
                 if(bloco->qntNo == grau)
                     divideNaoFolha(bloco);
                 return;
             }
-            else if(valor < bloco->valores[i] && bloco->blocosFilhos[i] == nullptr){
+            else if(valor <= bloco->valores[i] && bloco->blocosFilhos[i] == nullptr){
                 swap(bloco->valores[i], valor);
                 swap(bloco->ponteiros[i], pt);
                 if(i == bloco->qntNo){
@@ -219,7 +226,7 @@ public:
         vector < Bloco* > novosBlocos;
         for(auto curBlock : blocos){
             int j;
-            for(j=0; j<curBlock->qntNo; j++){
+            for(j=0; j < curBlock->qntNo; j++){
                 if(curBlock->blocosFilhos[j] != nullptr)
                     novosBlocos.push_back(curBlock->blocosFilhos[j]);
             }
@@ -253,7 +260,7 @@ public:
 
 
         if(novosBlocos.empty()){
-            std::ofstream output_file("blocos.data", std::ios::binary);
+            std::ofstream output_file(filename, std::ios::binary);
             for(registry re : regs){
                 output_file.write((char*)&re, sizeof(registry));
             }
@@ -268,6 +275,7 @@ public:
     }
 
     void printar(){
+        //cout << '\n';
         print(vector<Bloco*>{blocoRaiz});
     }
 
